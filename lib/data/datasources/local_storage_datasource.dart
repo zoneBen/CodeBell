@@ -70,4 +70,36 @@ class LocalStorageDataSource {
       throw StorageException('Failed to save use public broker flag: $e');
     }
   }
+
+  Future<String?> getMqttUsername() async {
+    try {
+      return _prefs.getString(StorageKeys.mqttUsername);
+    } catch (e) {
+      throw StorageException('Failed to get MQTT username: $e');
+    }
+  }
+
+  Future<void> saveMqttUsername(String username) async {
+    try {
+      await _prefs.setString(StorageKeys.mqttUsername, username);
+    } catch (e) {
+      throw StorageException('Failed to save MQTT username: $e');
+    }
+  }
+
+  Future<String?> getMqttPassword() async {
+    try {
+      return _prefs.getString(StorageKeys.mqttPassword);
+    } catch (e) {
+      throw StorageException('Failed to get MQTT password: $e');
+    }
+  }
+
+  Future<void> saveMqttPassword(String password) async {
+    try {
+      await _prefs.setString(StorageKeys.mqttPassword, password);
+    } catch (e) {
+      throw StorageException('Failed to save MQTT password: $e');
+    }
+  }
 }

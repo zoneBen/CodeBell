@@ -6,6 +6,7 @@ import '../../domain/entities/notification_history.dart';
 import '../../domain/repositories/mqtt_repository.dart';
 import '../../domain/repositories/settings_repository.dart';
 import '../bloc/device/device_bloc.dart';
+import '../bloc/device/device_event.dart';
 import '../bloc/device/device_state.dart';
 import '../bloc/mqtt/mqtt_bloc.dart';
 import '../bloc/mqtt/mqtt_event.dart';
@@ -61,11 +62,28 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  Future<void> _reconnect() async {
+    if (_deviceId == null) return;
+    final mqttConfig = await sl<SettingsRepository>().getMqttConfig();
+    if (context.mounted) {
+      context.read<MqttBloc>().add(MqttDisconnectRequested());
+      context.read<MqttBloc>().add(
+        MqttConnectRequested(
+          broker: mqttConfig.broker,
+          port: mqttConfig.port,
+          deviceId: _deviceId!,
+          username: mqttConfig.username,
+          password: mqttConfig.password,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('AIMSG'),
+        title: const Text('码哨'),
         actions: [
           BlocBuilder<MqttBloc, MqttState>(
             builder: (context, state) {
@@ -91,79 +109,157 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: BlocConsumer<DeviceBloc, DeviceState>(
-        listener: (context, state) async {
-          if (state is DeviceLoaded) {
-            _deviceId = state.deviceInfo.deviceId;
-            final mqttConfig = await sl<SettingsRepository>().getMqttConfig();
-            if (context.mounted) {
-              context.read<MqttBloc>().add(
-                MqttConnectRequested(
-                  broker: mqttConfig.broker,
-                  port: mqttConfig.port,
-                  deviceId: state.deviceInfo.deviceId,
+      body: Column(
+        children: [
+          _buildConnectionStatusBar(),
+          Expanded(
+            child: _buildMainContent(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildConnectionStatusBar() {
+    return BlocBuilder<MqttBloc, MqttState>(
+      builder: (context, state) {
+        String statusText = '未连接';
+        Color statusColor = Colors.red;
+        bool showReconnect = false;
+
+        if (state is MqttConnecting) {
+          statusText = '连接中...';
+          statusColor = Colors.orange;
+        } else if (state is MqttConnected) {
+          statusText = '已连接';
+          statusColor = Colors.green;
+        } else if (state is MqttError) {
+          statusText = '连接错误';
+          showReconnect = true;
+        } else if (state is MqttDisconnected) {
+          statusText = '已断开';
+          showReconnect = true;
+        }
+
+        return Container(
+          width: double.infinity,
+          color: Color.fromRGBO(
+            statusColor.red,
+            statusColor.green,
+            statusColor.blue,
+            0.1,
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
+            children: [
+              Icon(Icons.circle, size: 10, color: statusColor),
+              const SizedBox(width: 8),
+              Text(
+                statusText,
+                style: TextStyle(color: statusColor, fontSize: 14),
+              ),
+              const Spacer(),
+              if (showReconnect && _deviceId != null)
+                TextButton(
+                  onPressed: _reconnect,
+                  child: const Text('重新连接'),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildMainContent() {
+    return BlocConsumer<DeviceBloc, DeviceState>(
+      listener: (context, state) async {
+        if (state is DeviceLoaded) {
+          _deviceId = state.deviceInfo.deviceId;
+          final mqttConfig = await sl<SettingsRepository>().getMqttConfig();
+          if (context.mounted) {
+            context.read<MqttBloc>().add(
+              MqttConnectRequested(
+                broker: mqttConfig.broker,
+                port: mqttConfig.port,
+                deviceId: state.deviceInfo.deviceId,
+                username: mqttConfig.username,
+                password: mqttConfig.password,
+              ),
+            );
+          }
+        }
+      },
+      builder: (context, deviceState) {
+        if (deviceState is DeviceLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (deviceState is DeviceError) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('加载设备错误: ${deviceState.message}'),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    context.read<DeviceBloc>().add(DeviceLoadRequested());
+                  },
+                  child: const Text('重试'),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return BlocBuilder<NotificationBloc, NotificationState>(
+          builder: (context, notifState) {
+            if (notifState is NotificationLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            final notifications = notifState is NotificationLoaded
+                ? notifState.notifications
+                : <NotificationHistory>[];
+
+            if (notifications.isEmpty) {
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.notifications_none,
+                        size: 64,
+                        color: Colors.grey,
+                      ),
+                      SizedBox(height: 16),
+                      Text(
+                        '暂无通知',
+                        style: TextStyle(fontSize: 18, color: Colors.grey),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        '设置 Claude Code hook 以接收通知',
+                        style: TextStyle(fontSize: 14, color: Colors.grey),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
                 ),
               );
             }
-          }
-        },
-        builder: (context, deviceState) {
-          if (deviceState is DeviceLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
 
-          if (deviceState is DeviceError) {
-            return Center(child: Text('Error: ${deviceState.message}'));
-          }
-
-          return BlocBuilder<NotificationBloc, NotificationState>(
-            builder: (context, notifState) {
-              if (notifState is NotificationLoading) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
-              final notifications = notifState is NotificationLoaded
-                  ? notifState.notifications
-                  : <NotificationHistory>[];
-
-              if (notifications.isEmpty) {
-                return const Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(16),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.notifications_none,
-                          size: 64,
-                          color: Colors.grey,
-                        ),
-                        SizedBox(height: 16),
-                        Text(
-                          'No notifications yet',
-                          style: TextStyle(fontSize: 18, color: Colors.grey),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Set up the Claude Code hook to receive notifications',
-                          style: TextStyle(fontSize: 14, color: Colors.grey),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }
-
-              return ListView.builder(
-                itemCount: notifications.length,
-                itemBuilder: (context, index) =>
-                    NotificationCard(notification: notifications[index]),
-              );
-            },
-          );
-        },
-      ),
+            return ListView.builder(
+              itemCount: notifications.length,
+              itemBuilder: (context, index) =>
+                  NotificationCard(notification: notifications[index]),
+            );
+          },
+        );
+      },
     );
   }
 }

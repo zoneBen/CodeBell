@@ -49,6 +49,8 @@ class SettingsRepositoryImpl implements SettingsRepository {
 
       final broker = await _dataSource.getMqttBroker();
       final port = await _dataSource.getMqttPort();
+      final username = await _dataSource.getMqttUsername();
+      final password = await _dataSource.getMqttPassword();
 
       if (broker == null || port == null) {
         return const MqttConfig(
@@ -58,7 +60,13 @@ class SettingsRepositoryImpl implements SettingsRepository {
         );
       }
 
-      return MqttConfig(broker: broker, port: port, usePublicBroker: false);
+      return MqttConfig(
+        broker: broker,
+        port: port,
+        username: username,
+        password: password,
+        usePublicBroker: false,
+      );
     } on StorageException {
       rethrow;
     }
@@ -71,6 +79,12 @@ class SettingsRepositoryImpl implements SettingsRepository {
       if (!config.usePublicBroker) {
         await _dataSource.saveMqttBroker(config.broker);
         await _dataSource.saveMqttPort(config.port);
+        if (config.username != null) {
+          await _dataSource.saveMqttUsername(config.username!);
+        }
+        if (config.password != null) {
+          await _dataSource.saveMqttPassword(config.password!);
+        }
       }
     } on StorageException {
       rethrow;

@@ -1,5 +1,5 @@
-name: aimsg
-description: "Claude Code Task Notification System"
+name: codebell
+description: "码哨 - Claude Code Task Notification System"
 publish_to: 'none'
 version: 1.0.0+1
 

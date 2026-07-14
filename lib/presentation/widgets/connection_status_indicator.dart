@@ -20,7 +20,7 @@ class ConnectionStatusIndicator extends StatelessWidget {
         ),
         const SizedBox(width: 8),
         Text(
-          isConnected ? 'Connected' : 'Disconnected',
+          isConnected ? '已连接' : '已断开',
           style: Theme.of(context).textTheme.bodyMedium,
         ),
       ],
