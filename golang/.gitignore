@@ -1,0 +1,11 @@
+# Binary
+aimsg-notifier
+aimsg-notifier.exe
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
