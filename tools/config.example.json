@@ -1,0 +1,5 @@
+{
+  "deviceId": "your_device_id_from_app",
+  "broker": "test.mosquitto.org",
+  "port": 1883
+}

@@ -1,0 +1,10 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "description": "Send AIMSG notification when Claude Code completes a task",
+        "command": "dart run d:/works/flutter/aimsg/tools/claude_hook.dart --device-id=8b32c4ed61f24841"
+      }
+    ]
+  }
+}

@@ -1,0 +1,10 @@
+name: aimsg_claude_hook
+description: Claude Code hook for sending notifications via MQTT
+version: 1.0.0
+
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  mqtt_client: ^10.0.0
+  uuid: ^4.3.3
