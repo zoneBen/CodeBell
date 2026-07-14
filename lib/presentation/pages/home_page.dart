@@ -149,9 +149,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       body: Column(
         children: [
           _buildConnectionStatusBar(),
-          Expanded(
-            child: _buildMainContent(),
-          ),
+          Expanded(child: _buildMainContent()),
         ],
       ),
     );
@@ -192,10 +190,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               ),
               const Spacer(),
               if (showReconnect && _deviceId != null)
-                TextButton(
-                  onPressed: _reconnect,
-                  child: const Text('重新连接'),
-                ),
+                TextButton(onPressed: _reconnect, child: const Text('重新连接')),
             ],
           ),
         );

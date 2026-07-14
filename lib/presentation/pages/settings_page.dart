@@ -67,9 +67,9 @@ class _SettingsPageState extends State<SettingsPage> {
 
   void _copyDeviceId() {
     Clipboard.setData(ClipboardData(text: _deviceIdController.text));
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('设备ID已复制到剪贴板')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('设备ID已复制到剪贴板')));
   }
 
   void _generateNewId() {
@@ -89,9 +89,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> _saveDeviceId() async {
     final repo = sl<SettingsRepository>();
-    await repo.saveDeviceInfo(
-      DeviceInfo(deviceId: _deviceIdController.text),
-    );
+    await repo.saveDeviceInfo(DeviceInfo(deviceId: _deviceIdController.text));
   }
 
   Future<void> _saveSettings() async {
@@ -107,17 +105,21 @@ class _SettingsPageState extends State<SettingsPage> {
     final config = MqttConfig(
       broker: _brokerController.text,
       port: port ?? 1883,
-      username: _usernameController.text.isEmpty ? null : _usernameController.text,
-      password: _passwordController.text.isEmpty ? null : _passwordController.text,
+      username: _usernameController.text.isEmpty
+          ? null
+          : _usernameController.text,
+      password: _passwordController.text.isEmpty
+          ? null
+          : _passwordController.text,
       usePublicBroker: _usePublicBroker,
     );
 
     await repo.saveMqttConfig(config);
 
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('设置已保存')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('设置已保存')));
 
       // Reconnect with new settings
       final deviceState = context.read<DeviceBloc>().state;
@@ -297,10 +299,7 @@ class _SettingsPageState extends State<SettingsPage> {
               '码哨 - Claude Code 任务通知系统\n\n当 Claude Code 完成任务时，此应用会接收通知。',
             ),
             const SizedBox(height: 8),
-            const Text(
-              '版本 1.0.0',
-              style: TextStyle(color: Colors.grey),
-            ),
+            const Text('版本 1.0.0', style: TextStyle(color: Colors.grey)),
           ],
         ),
       ),
