@@ -22,7 +22,7 @@ func NewNotificationMessage(notifyType, title, body string, data map[string]inte
 	return &NotificationMessage{
 		ID:        uuid.NewString(),
 		Type:      notifyType,
-		Timestamp: time.Now().UTC(),
+		Timestamp: time.Now().UTC().Truncate(time.Millisecond),
 		Title:     title,
 		Body:      body,
 		Data:      data,

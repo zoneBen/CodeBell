@@ -1,6 +1,11 @@
-# Binary
+# Binaries
 aimsg-notifier
 aimsg-notifier.exe
+subscriber
+subscriber.exe
+
+# Test files
+test_*.go
 
 # IDE
 .idea/
@@ -9,3 +14,6 @@ aimsg-notifier.exe
 *.swo
 *~
 
+# OS
+.DS_Store
+Thumbs.db

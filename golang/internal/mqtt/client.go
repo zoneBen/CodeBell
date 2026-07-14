@@ -29,7 +29,7 @@ func (c *Client) Connect() error {
 	opts := mqtt.NewClientOptions()
 	brokerURL := fmt.Sprintf("tcp://%s:%d", c.config.Broker, c.config.Port)
 	opts.AddBroker(brokerURL)
-	opts.SetClientID(models.ClientIDPrefix + c.config.DeviceID)
+	opts.SetClientID(models.ClientIDPrefix + c.config.DeviceID + "_notifier")
 	opts.SetKeepAlive(30 * time.Second)
 	opts.SetAutoReconnect(true)
 	opts.SetCleanSession(true)
@@ -94,6 +94,7 @@ func (c *Client) PublishNotification(msg *models.NotificationMessage) error {
 
 	topic := models.NotificationTopic(c.config.DeviceID)
 	c.logger.Printf("Publishing notification to %s: %s", topic, msg.Title)
+	c.logger.Printf("Payload: %s", string(payload))
 
 	token := c.client.Publish(topic, 1, false, payload)
 	if token.Wait() && token.Error() != nil {
