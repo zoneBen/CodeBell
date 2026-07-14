@@ -6,5 +6,8 @@ abstract class MqttRepository {
   Future<void> disconnect();
   Stream<NotificationMessage> get notificationStream;
   Stream<bool> get connectionStatusStream;
-  Future<void> publishNotification(NotificationMessage message, String deviceId);
+  Future<void> publishNotification(
+    NotificationMessage message,
+    String deviceId,
+  );
 }

@@ -9,7 +9,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
   final HistoryRepository _historyRepository;
 
   NotificationBloc(this._getHistoryUseCase, this._historyRepository)
-      : super(NotificationInitial()) {
+    : super(NotificationInitial()) {
     on<NotificationLoadRequested>(_onLoadRequested);
     on<NotificationReceived>(_onNotificationReceived);
     on<NotificationClearAllRequested>(_onClearAllRequested);

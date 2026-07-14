@@ -27,6 +27,5 @@ class MqttDataSource {
   Future<void> publishNotification(
     NotificationMessage message,
     String deviceId,
-  ) =>
-      _client.publishNotification(message, deviceId);
+  ) => _client.publishNotification(message, deviceId);
 }

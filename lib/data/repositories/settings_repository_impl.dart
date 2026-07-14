@@ -58,11 +58,7 @@ class SettingsRepositoryImpl implements SettingsRepository {
         );
       }
 
-      return MqttConfig(
-        broker: broker,
-        port: port,
-        usePublicBroker: false,
-      );
+      return MqttConfig(broker: broker, port: port, usePublicBroker: false);
     } on StorageException {
       rethrow;
     }

@@ -27,9 +27,9 @@ class NotificationHelper {
 
       const InitializationSettings initializationSettings =
           InitializationSettings(
-        android: initializationSettingsAndroid,
-        iOS: initializationSettingsIOS,
-      );
+            android: initializationSettingsAndroid,
+            iOS: initializationSettingsIOS,
+          );
 
       await _notifications!.initialize(initializationSettings);
       _initialized = true;
@@ -54,15 +54,16 @@ class NotificationHelper {
     try {
       const AndroidNotificationDetails androidPlatformChannelSpecifics =
           AndroidNotificationDetails(
-        'aimsg_channel',
-        'Task Notifications',
-        channelDescription: 'Notifications for completed Claude Code tasks',
-        importance: Importance.max,
-        priority: Priority.high,
-      );
+            'aimsg_channel',
+            'Task Notifications',
+            channelDescription: 'Notifications for completed Claude Code tasks',
+            importance: Importance.max,
+            priority: Priority.high,
+          );
 
-      const NotificationDetails platformChannelSpecifics =
-          NotificationDetails(android: androidPlatformChannelSpecifics);
+      const NotificationDetails platformChannelSpecifics = NotificationDetails(
+        android: androidPlatformChannelSpecifics,
+      );
 
       await _notifications!.show(
         DateTime.now().millisecond,

@@ -6,7 +6,9 @@ class HistoryRepositoryImpl implements HistoryRepository {
 
   @override
   Future<List<NotificationHistory>> getAll() async {
-    return List.unmodifiable(_history..sort((a, b) => b.timestamp.compareTo(a.timestamp)));
+    return List.unmodifiable(
+      _history..sort((a, b) => b.timestamp.compareTo(a.timestamp)),
+    );
   }
 
   @override

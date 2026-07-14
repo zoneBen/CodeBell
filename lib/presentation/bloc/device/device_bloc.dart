@@ -9,7 +9,7 @@ class DeviceBloc extends Bloc<DeviceEvent, DeviceState> {
   final SaveDeviceIdUseCase _saveDeviceIdUseCase;
 
   DeviceBloc(this._getDeviceIdUseCase, this._saveDeviceIdUseCase)
-      : super(DeviceInitial()) {
+    : super(DeviceInitial()) {
     on<DeviceLoadRequested>(_onLoadRequested);
     on<DeviceSaveRequested>(_onSaveRequested);
   }

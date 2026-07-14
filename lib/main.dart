@@ -32,9 +32,7 @@ class MyApp extends StatelessWidget {
           BlocProvider<DeviceBloc>.value(
             value: sl<DeviceBloc>()..add(DeviceLoadRequested()),
           ),
-          BlocProvider<MqttBloc>.value(
-            value: sl<MqttBloc>(),
-          ),
+          BlocProvider<MqttBloc>.value(value: sl<MqttBloc>()),
           BlocProvider<NotificationBloc>.value(
             value: sl<NotificationBloc>()..add(NotificationLoadRequested()),
           ),

@@ -1,9 +1,7 @@
 import '../../domain/entities/device_info.dart';
 
 class DeviceInfoModel extends DeviceInfo {
-  const DeviceInfoModel({
-    required super.deviceId,
-  });
+  const DeviceInfoModel({required super.deviceId});
 
   factory DeviceInfoModel.fromEntity(DeviceInfo entity) {
     return DeviceInfoModel(deviceId: entity.deviceId);

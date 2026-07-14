@@ -30,7 +30,9 @@ Future<void> initServiceLocator() async {
 
   // Repositories
   sl.registerLazySingleton<MqttRepository>(() => MqttRepositoryImpl(sl()));
-  sl.registerLazySingleton<SettingsRepository>(() => SettingsRepositoryImpl(sl()));
+  sl.registerLazySingleton<SettingsRepository>(
+    () => SettingsRepositoryImpl(sl()),
+  );
   sl.registerLazySingleton<HistoryRepository>(() => HistoryRepositoryImpl());
 
   // Use cases

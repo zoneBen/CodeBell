@@ -16,5 +16,11 @@ class MqttConfig extends Equatable {
   });
 
   @override
-  List<Object?> get props => [broker, port, username, password, usePublicBroker];
+  List<Object?> get props => [
+    broker,
+    port,
+    username,
+    password,
+    usePublicBroker,
+  ];
 }

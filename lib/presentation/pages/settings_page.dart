@@ -49,9 +49,7 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Settings'),
-      ),
+      appBar: AppBar(title: const Text('Settings')),
       body: ListView(
         children: [
           _buildDeviceIdSection(),
@@ -68,10 +66,7 @@ class _SettingsPageState extends State<SettingsPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Device ID',
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
+          Text('Device ID', style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 8),
           Text(
             'Use this ID to pair your Claude Code hooks with this app.',
@@ -127,10 +122,7 @@ class _SettingsPageState extends State<SettingsPage> {
             'This app receives notifications when Claude Code completes tasks.',
           ),
           SizedBox(height: 8),
-          Text(
-            'Version 1.0.0',
-            style: TextStyle(color: Colors.grey),
-          ),
+          Text('Version 1.0.0', style: TextStyle(color: Colors.grey)),
         ],
       ),
     );

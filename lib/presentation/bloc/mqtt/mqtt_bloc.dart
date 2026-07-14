@@ -32,17 +32,17 @@ class MqttBloc extends Bloc<MqttEvent, MqttState> {
     emit(MqttConnecting());
     try {
       // Listen to connection status FIRST before connecting
-      _connectionSubscription = _mqttRepository.connectionStatusStream.listen(
-        (isConnected) {
-          if (!isClosed) {
-            if (isConnected) {
-              emit(MqttConnected());
-            } else {
-              emit(MqttDisconnected());
-            }
+      _connectionSubscription = _mqttRepository.connectionStatusStream.listen((
+        isConnected,
+      ) {
+        if (!isClosed) {
+          if (isConnected) {
+            emit(MqttConnected());
+          } else {
+            emit(MqttDisconnected());
           }
-        },
-      );
+        }
+      });
 
       final config = MqttConfig(
         broker: event.broker,

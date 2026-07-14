@@ -35,10 +35,7 @@ void main() async {
     'timestamp': DateTime.now().toUtc().toIso8601String(),
     'title': 'Test Notification',
     'body': 'This is a simple test message',
-    'data': {
-      'taskType': 'test_task',
-      'status': 'success',
-    },
+    'data': {'taskType': 'test_task', 'status': 'success'},
   };
 
   // Encode to JSON string
@@ -51,11 +48,7 @@ void main() async {
   final topic = 'claude/$deviceId/notification';
   print('Publishing to: $topic');
 
-  client.publishMessage(
-    topic,
-    MqttQos.atLeastOnce,
-    builder.payload!,
-  );
+  client.publishMessage(topic, MqttQos.atLeastOnce, builder.payload!);
 
   print('Message sent!');
 

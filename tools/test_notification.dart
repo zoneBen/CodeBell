@@ -22,9 +22,9 @@ void main() async {
   client.logging(on: true);
   client.keepAlivePeriod = 30;
 
-  final connMessage = MqttConnectMessage()
-      .startClean()
-      .withWillQos(MqttQos.atLeastOnce);
+  final connMessage = MqttConnectMessage().startClean().withWillQos(
+    MqttQos.atLeastOnce,
+  );
 
   client.connectionMessage = connMessage;
 
@@ -51,10 +51,7 @@ void main() async {
     'timestamp': DateTime.now().toUtc().toIso8601String(),
     'title': '✅ Claude Code Task Complete!',
     'body': 'Your test task has finished successfully!',
-    'data': {
-      'taskType': 'test_task',
-      'status': 'success',
-    },
+    'data': {'taskType': 'test_task', 'status': 'success'},
   });
 
   final builder = MqttClientPayloadBuilder();
@@ -66,11 +63,7 @@ void main() async {
   print('📄 Message: $payload');
   print('');
 
-  client.publishMessage(
-    topic,
-    MqttQos.atLeastOnce,
-    builder.payload!,
-  );
+  client.publishMessage(topic, MqttQos.atLeastOnce, builder.payload!);
 
   print('✅ Notification sent!');
   print('');

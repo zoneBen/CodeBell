@@ -23,13 +23,13 @@ class MqttClientWrapper {
   String? _username;
   String? _password;
   bool _isAutoReconnecting = false;
-  StreamSubscription<List<MqttReceivedMessage<MqttMessage?>>>? _messageSubscription;
+  StreamSubscription<List<MqttReceivedMessage<MqttMessage?>>>?
+  _messageSubscription;
 
   Stream<NotificationMessage> get notificationStream =>
       _notificationController.stream;
 
-  Stream<bool> get connectionStatusStream =>
-      _connectionStatusController.stream;
+  Stream<bool> get connectionStatusStream => _connectionStatusController.stream;
 
   Stream<String> get logStream => _logController.stream;
 
@@ -134,7 +134,9 @@ class MqttClientWrapper {
     _log('Disconnected!');
     _connectionStatusController.add(false);
     // Schedule auto-reconnect if we have connection details
-    if (_currentBroker != null && _currentPort != null && _currentDeviceId != null) {
+    if (_currentBroker != null &&
+        _currentPort != null &&
+        _currentDeviceId != null) {
       _scheduleAutoReconnect();
     }
   }
@@ -146,7 +148,9 @@ class MqttClientWrapper {
     }
     _log('Scheduling auto-reconnect in 5 seconds...');
     Future.delayed(const Duration(seconds: 5), () {
-      if (_currentBroker != null && _currentPort != null && _currentDeviceId != null) {
+      if (_currentBroker != null &&
+          _currentPort != null &&
+          _currentDeviceId != null) {
         _log('Trying to auto-reconnect...');
         connect(
           _currentBroker!,
@@ -166,7 +170,9 @@ class MqttClientWrapper {
     // Cancel any existing subscription first
     _messageSubscription?.cancel();
 
-    _messageSubscription = _client!.updates!.listen((List<MqttReceivedMessage<MqttMessage?>>? c) {
+    _messageSubscription = _client!.updates!.listen((
+      List<MqttReceivedMessage<MqttMessage?>>? c,
+    ) {
       _log('Received message update from broker!');
       if (c == null || c.isEmpty) {
         _log('  Warning: Empty message list!');
@@ -174,8 +180,9 @@ class MqttClientWrapper {
       }
 
       final recMess = c[0].payload as MqttPublishMessage;
-      final payload =
-          MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
+      final payload = MqttPublishPayload.bytesToStringAsString(
+        recMess.payload.message,
+      );
       _log('  Received raw payload: $payload');
 
       if (topic.contains('notification')) {
@@ -188,7 +195,14 @@ class MqttClientWrapper {
           _log('  Error parsing message: $e');
           // Try to extract what we can from raw payload
           try {
-            final json = jsonDecode(payload.replaceAll(RegExp(r'[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]'), '')) as Map<String, dynamic>;
+            final json =
+                jsonDecode(
+                      payload.replaceAll(
+                        RegExp(r'[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]'),
+                        '',
+                      ),
+                    )
+                    as Map<String, dynamic>;
             _log('  Fallback: extracted JSON keys: ${json.keys}');
           } catch (e2) {
             _log('  Fallback also failed: $e2');

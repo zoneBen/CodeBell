@@ -23,8 +23,7 @@ class MqttRepositoryImpl implements MqttRepository {
       _dataSource.notificationStream;
 
   @override
-  Stream<bool> get connectionStatusStream =>
-      _dataSource.connectionStatusStream;
+  Stream<bool> get connectionStatusStream => _dataSource.connectionStatusStream;
 
   @override
   Future<void> publishNotification(

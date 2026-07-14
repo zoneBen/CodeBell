@@ -1,4 +1,5 @@
 #!/usr/bin/env dart
+
 /// Claude Code Task Completion Hook
 ///
 /// This script sends an MQTT notification when a Claude Code task completes.
@@ -56,11 +57,17 @@ void main(List<String> args) async {
   port ??= int.tryParse(Platform.environment['AIMSG_PORT'] ?? '') ?? 1883;
 
   if (deviceId == null || deviceId.isEmpty) {
-    print('Error: Device ID is required. Use --device-id or set AIMSG_DEVICE_ID environment variable.');
+    print(
+      'Error: Device ID is required. Use --device-id or set AIMSG_DEVICE_ID environment variable.',
+    );
     print('');
-    print('Your device ID can be found in the AIMSG Flutter app: 8b32c4ed61f24841');
+    print(
+      'Your device ID can be found in the AIMSG Flutter app: 8b32c4ed61f24841',
+    );
     print('');
-    print('Usage: dart run claude_hook.dart --device-id="8b32c4ed61f24841" [task_type]');
+    print(
+      'Usage: dart run claude_hook.dart --device-id="8b32c4ed61f24841" [task_type]',
+    );
     exit(1);
   }
 
@@ -80,9 +87,9 @@ Future<void> sendNotification(
   client.logging(on: false);
   client.keepAlivePeriod = 30;
 
-  final connMessage = MqttConnectMessage()
-      .startClean()
-      .withWillQos(MqttQos.atLeastOnce);
+  final connMessage = MqttConnectMessage().startClean().withWillQos(
+    MqttQos.atLeastOnce,
+  );
 
   client.connectionMessage = connMessage;
 
@@ -107,20 +114,14 @@ Future<void> sendNotification(
     'timestamp': DateTime.now().toUtc().toIso8601String(),
     'title': '✅ Claude Code Task Complete',
     'body': 'Your task has finished: $taskType',
-    'data': {
-      'taskType': taskType,
-    },
+    'data': {'taskType': taskType},
   });
 
   final builder = MqttClientPayloadBuilder();
   builder.addString(payload);
 
   final topic = 'claude/$deviceId/notification';
-  client.publishMessage(
-    topic,
-    MqttQos.atLeastOnce,
-    builder.payload!,
-  );
+  client.publishMessage(topic, MqttQos.atLeastOnce, builder.payload!);
 
   print('Notification sent to device $deviceId');
 

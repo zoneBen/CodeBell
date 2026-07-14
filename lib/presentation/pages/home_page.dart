@@ -98,12 +98,12 @@ class _HomePageState extends State<HomePage> {
             final mqttConfig = await sl<SettingsRepository>().getMqttConfig();
             if (context.mounted) {
               context.read<MqttBloc>().add(
-                    MqttConnectRequested(
-                      broker: mqttConfig.broker,
-                      port: mqttConfig.port,
-                      deviceId: state.deviceInfo.deviceId,
-                    ),
-                  );
+                MqttConnectRequested(
+                  broker: mqttConfig.broker,
+                  port: mqttConfig.port,
+                  deviceId: state.deviceInfo.deviceId,
+                ),
+              );
             }
           }
         },
@@ -113,9 +113,7 @@ class _HomePageState extends State<HomePage> {
           }
 
           if (deviceState is DeviceError) {
-            return Center(
-              child: Text('Error: ${deviceState.message}'),
-            );
+            return Center(child: Text('Error: ${deviceState.message}'));
           }
 
           return BlocBuilder<NotificationBloc, NotificationState>(
@@ -124,8 +122,9 @@ class _HomePageState extends State<HomePage> {
                 return const Center(child: CircularProgressIndicator());
               }
 
-              final notifications =
-                  notifState is NotificationLoaded ? notifState.notifications : <NotificationHistory>[];
+              final notifications = notifState is NotificationLoaded
+                  ? notifState.notifications
+                  : <NotificationHistory>[];
 
               if (notifications.isEmpty) {
                 return const Center(
@@ -134,7 +133,11 @@ class _HomePageState extends State<HomePage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.notifications_none, size: 64, color: Colors.grey),
+                        Icon(
+                          Icons.notifications_none,
+                          size: 64,
+                          color: Colors.grey,
+                        ),
                         SizedBox(height: 16),
                         Text(
                           'No notifications yet',
@@ -154,9 +157,8 @@ class _HomePageState extends State<HomePage> {
 
               return ListView.builder(
                 itemCount: notifications.length,
-                itemBuilder: (context, index) => NotificationCard(
-                  notification: notifications[index],
-                ),
+                itemBuilder: (context, index) =>
+                    NotificationCard(notification: notifications[index]),
               );
             },
           );
