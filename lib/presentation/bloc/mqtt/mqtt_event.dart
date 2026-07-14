@@ -16,4 +16,6 @@ class MqttConnectRequested extends MqttEvent {
   });
 }
 
+class MqttAutoReconnectRequested extends MqttEvent {}
+
 class MqttDisconnectRequested extends MqttEvent {}

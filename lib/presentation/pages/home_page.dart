@@ -25,15 +25,30 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   late MqttRepository _mqttRepository;
   String? _deviceId;
+  bool _hasAttemptedAutoConnect = false;
 
   @override
   void initState() {
     super.initState();
     _mqttRepository = sl();
     _listenToNotifications();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _tryAutoReconnect();
+    }
   }
 
   void _listenToNotifications() {
@@ -62,21 +77,43 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  Future<void> _connectWithDeviceId(String deviceId) async {
+    final mqttConfig = await sl<SettingsRepository>().getMqttConfig();
+    if (!mounted) return;
+    context.read<MqttBloc>().add(
+      MqttConnectRequested(
+        broker: mqttConfig.broker,
+        port: mqttConfig.port,
+        deviceId: deviceId,
+        username: mqttConfig.username,
+        password: mqttConfig.password,
+      ),
+    );
+  }
+
+  Future<void> _tryAutoReconnect() async {
+    if (_deviceId == null) return;
+    final currentState = context.read<MqttBloc>().state;
+    if (currentState is! MqttConnected && currentState is! MqttConnecting) {
+      context.read<MqttBloc>().add(MqttAutoReconnectRequested());
+    }
+  }
+
   Future<void> _reconnect() async {
     if (_deviceId == null) return;
+    final mqttBloc = context.read<MqttBloc>();
     final mqttConfig = await sl<SettingsRepository>().getMqttConfig();
-    if (context.mounted) {
-      context.read<MqttBloc>().add(MqttDisconnectRequested());
-      context.read<MqttBloc>().add(
-        MqttConnectRequested(
-          broker: mqttConfig.broker,
-          port: mqttConfig.port,
-          deviceId: _deviceId!,
-          username: mqttConfig.username,
-          password: mqttConfig.password,
-        ),
-      );
-    }
+    if (!mounted) return;
+    mqttBloc.add(MqttDisconnectRequested());
+    mqttBloc.add(
+      MqttConnectRequested(
+        broker: mqttConfig.broker,
+        port: mqttConfig.port,
+        deviceId: _deviceId!,
+        username: mqttConfig.username,
+        password: mqttConfig.password,
+      ),
+    );
   }
 
   @override
@@ -143,12 +180,7 @@ class _HomePageState extends State<HomePage> {
 
         return Container(
           width: double.infinity,
-          color: Color.fromRGBO(
-            statusColor.red,
-            statusColor.green,
-            statusColor.blue,
-            0.1,
-          ),
+          color: statusColor.withValues(alpha: 0.1),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Row(
             children: [
@@ -173,20 +205,12 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildMainContent() {
     return BlocConsumer<DeviceBloc, DeviceState>(
-      listener: (context, state) async {
+      listener: (context, state) {
         if (state is DeviceLoaded) {
           _deviceId = state.deviceInfo.deviceId;
-          final mqttConfig = await sl<SettingsRepository>().getMqttConfig();
-          if (context.mounted) {
-            context.read<MqttBloc>().add(
-              MqttConnectRequested(
-                broker: mqttConfig.broker,
-                port: mqttConfig.port,
-                deviceId: state.deviceInfo.deviceId,
-                username: mqttConfig.username,
-                password: mqttConfig.password,
-              ),
-            );
+          if (!_hasAttemptedAutoConnect) {
+            _hasAttemptedAutoConnect = true;
+            _connectWithDeviceId(state.deviceInfo.deviceId);
           }
         }
       },
