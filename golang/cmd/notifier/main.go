@@ -16,11 +16,23 @@ import (
 func main() {
 	logger := log.New(os.Stderr, "[notifier] ", log.LstdFlags)
 
+	// Log all environment variables for debugging
+	logger.Println("=== Starting notifier ===")
+	logger.Printf("CLAUDE_DEVICE_ID: %s", os.Getenv("CLAUDE_DEVICE_ID"))
+	logger.Printf("CLAUDE_HOOK_EVENT: %s", os.Getenv("CLAUDE_HOOK_EVENT"))
+	logger.Printf("CLAUDE_HOOK_MESSAGE: %s", os.Getenv("CLAUDE_HOOK_MESSAGE"))
+	logger.Printf("MQTT_USERNAME: %s", os.Getenv("MQTT_USERNAME"))
+	logger.Printf("Current working dir: %s", getCWD())
+
 	// Load config
 	cfg, err := config.Load()
 	if err != nil {
 		logger.Fatalf("Configuration error: %v", err)
 	}
+
+	logger.Printf("Mode: %s", cfg.Mode)
+	logger.Printf("Device ID: %s", cfg.DeviceID)
+	logger.Printf("MQTT Broker: %s:%d", cfg.MQTT.Broker, cfg.MQTT.Port)
 
 	// Create MQTT client
 	mqttClient := mqtt.NewClient(cfg.MQTT, logger)
@@ -42,6 +54,8 @@ func main() {
 	if err != nil {
 		logger.Fatalf("Error: %v", err)
 	}
+
+	logger.Println("=== Notifier completed ===")
 }
 
 func runHookMode(cfg *config.Config, mqttClient *mqtt.Client, logger *log.Logger) error {
